@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Проверка ключа | Доступ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #0b1c3a 0%, #0a2540 50%, #051a30 100%);
+      padding: 20px;
+      transition: background 0.3s ease;
+    }
+
+    body.error-state {
+      background: linear-gradient(145deg, #5a1010 0%, #831d1d 50%, #4f0a0a 100%);
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(66, 153, 225, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.25s ease;
+      text-align: center;
+      color: #e0f0ff;
+    }
+
+    body.error-state .container {
+      box-shadow: 0 30px 50px rgba(80, 0, 0, 0.7), 0 0 0 1px rgba(255, 90, 90, 0.5);
+      border-color: rgba(255, 70, 70, 0.4);
+      background: rgba(20, 5, 5, 0.7);
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 2rem;
+      letter-spacing: -0.5px;
+      margin-bottom: 2rem;
+      color: white;
+      text-shadow: 0 4px 12px rgba(0, 160, 255, 0.5);
+    }
+
+    body.error-state h1 {
+      text-shadow: 0 4px 12px rgba(255, 60, 60, 0.7);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    label {
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+      color: #bed9ff;
+    }
+
+    .input-field {
+      display: flex;
+      align-items: center;
+      background: rgba(10, 25, 50, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 60px;
+      padding: 0.2rem 0.2rem 0.2rem 1.8rem;
+      border: 1.5px solid rgba(66, 153, 225, 0.5);
+      transition: all 0.25s;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .input-field:focus-within {
+      border-color: #3b9eff;
+      box-shadow: 0 0 18px #1e6ef0;
+    }
+
+    body.error-state .input-field {
+      border-color: rgba(255, 100, 100, 0.7);
+      background: rgba(30, 5, 5, 0.8);
+    }
+
+    body.error-state .input-field:focus-within {
+      box-shadow: 0 0 18px #c53030;
+      border-color: #ff5e5e;
+    }
+
+    input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 0.9rem 0.2rem;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #e6f0ff;
+      outline: none;
+      letter-spacing: 0.8px;
+    }
+
+    input::placeholder {
+      color: rgba(180, 210, 255, 0.55);
+      font-weight: 400;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .btn {
+      background: #1e5bcf;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 0.9rem 2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #1f6ed4, #0f4ba3);
+      box-shadow: 0 10px 18px rgba(0, 100, 255, 0.4);
+      transition: all 0.2s ease;
+      letter-spacing: 0.6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      width: 100%;
+      text-transform: uppercase;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #2b7ae8, #1350c0);
+      box-shadow: 0 14px 22px rgba(0, 120, 255, 0.6);
+      transform: scale(1.02);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    body.error-state .btn {
+      background: linear-gradient(135deg, #b33a3a, #7a2020);
+      box-shadow: 0 10px 18px rgba(200, 30, 30, 0.5);
+      border-color: rgba(255, 200, 200, 0.3);
+    }
+
+    .message-box {
+      margin-top: 1.8rem;
+      font-weight: 500;
+      font-size: 1.1rem;
+      min-height: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: 0.2s;
+      color: #c7e0ff;
+      word-break: break-word;
+    }
+
+    .error-text {
+      color: #ffa0a0;
+      font-weight: 600;
+      background: rgba(180, 0, 0, 0.2);
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      backdrop-filter: blur(8px);
+    }
+
+    body.error-state .error-text {
+      color: #ffcece;
+      background: rgba(180, 0, 0, 0.35);
+    }
+
+    .success-link {
+      color: #b3f0c0;
+      background: rgba(0, 100, 50, 0.3);
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      word-break: break-all;
+    }
+
+    .success-link:hover {
+      color: #d0ffd0;
+    }
+  </style>
+</head>
+<body id="mainBody">
+  <div class="container">
+    <h1>Доступ по ключу</h1>
+
+    <div class="input-group">
+      <label for="keyInput">Введите ключ:</label>
+      <div class="input-field">
+        <input type="text" id="keyInput" placeholder="" autocomplete="off" autofocus>
+      </div>
+      <button class="btn" id="checkBtn">Проверить</button>
+    </div>
+
+    <div id="messageContainer" class="message-box"></div>
+  </div>
+
+  <script>
+    (function() {
+      const VALID_KEYS = new Set([
+        "Ych329","Ktp874","Lmn219","Bgr657","Xwp492","Qrt108","Nvf365","Zjd841","Hcx203","Fmd759",
+        "Rag314","Wbo568","Tle970","Pky125","Suz486","Vji732","Dcq198","Eow654","Gld027","Axm843",
+        "Jyn571","Ckf306","Uhp429","Oqb183","Mvr960","Ypd257","Lwx694","Bta831","Nkc407","Zer185",
+        "Xhs592","Qfu328","Htj764","Fpl209","Rvm546","Wdq873","Tgy110","Pxk947","Sjn384","Vab726",
+        "Dmf153","Ecg498","Gpo860","Aqt237","Jld574","Cnx912","Uyr345","Osv678","Mhk091","Ywf426",
+        "Lqb759","Bnv083","Ncx316","Zpj549","Xrk872","Qtm105","Hvz438","Fdg761","Rwu094","Wsy327",
+        "Tkd650","Paf983","Sbe216","Vqc548","Dwx871","Eyj204","Gfh537","Anr860","Jmk193","Cpt426",
+        "Uln759","Oge082","Mhv315","Yca648","Lzx971","Bqf234","Nko567","Zat890","Xpg123","Qlj456",
+        "Hmw789","Fcv012","Ryb345","Wnd678","Tvg901","Pxh234","Sqy567","Vfk890","Dlb123","Ecp456",
+        "Giz789","Aow012","Jup345","Crs678","Umv901","Otw234","Mfx567","Ygc890","Lhd123","Biy456",
+        "Nkv789","Zou012","Xpe345","Qrj678","Hsm901","Fwg234","Rcb567","Wpo890","Tln123","Pda456",
+        "Sif789","Vhb012","Dmc345","Egn678","Gty901","Auk234","Jvs567","Cwf890","Uxl123","Ocj456",
+        "Mqy789","Ybv012","Lrt345","Bnu678","Npc901","Zad234","Xwo567","Qem890","Hfk123","Frj456",
+        "Rsn789","Wug012","Tqh345","Pmj678","Slb901","Vcw234","Dzp567","Eha890","Gkn123","Aqm456",
+        "Jbt789","Cdv012","Uon345","Oxr678","Mce901","Ytv234","Lxy567","Bqh890","Nfo123","Zgd456",
+        "Xin789","Qjw012","Hrb345","Fsm678","Rkc901","Wpy234","Tgd567","Plm890","Sui123","Vvj456",
+        "Dwh789","Efk012","Gmq345","Atn678","Jax901","Csd234","Uze567","Oxi890","Mgr123","Yyw456",
+        "Lhb789","Bms012","Ntd345","Zwu678","Xcv901","Qeg234","Hnf567","Ftp890","Rvl123","Wcu456",
+        "Tsd789","Puy012","Sfm345","Vjx678","Dno901","Ebv234","Grh567","Awm890","Jvi123","Cuk456",
+        "Ujw789","Ozy012","Mst345","Ybn678","Lfc901","Bwo234","Ncq567","Zti890","Xev123","Qyb456",
+        "Hxp789","Faj012","Rcv345","Wzy678","Tgh901","Pun234","Sbc567","Vfg890","Dkm123","Emn456",
+        "Gwe789","Axc012","Jrt345","Cbs678","Udf901","Olo234","Msr567","Ynp890","Lig123","Bym456",
+        "Npa789","Zje012","Xsy345","Qmv678","Hzo901","Fpn234","Rfx567","Wab890","Tcl123","Pks456",
+        "Sma789","Vqn012","Dyb345","Ewc678","Gdi901","Abf234","Jhz567","Ckx890","Uyd123","Otm456",
+        "Mcl789","Yiq012","Lju345","Brh678","Npn901","Zbs234","Xdq567","Qel890","Hcf123","Fwu456",
+        "Rkx789","Wgf012","Tvp345","Pya678","Swj901","Vri234","Dlz567","Ead890","Gou123","Ayk456",
+        "Jmw789","Czh012","Ufv345","Ogm678","Mub901","Ysk234","Lqt567","Bvm890","Nrf123","Zwc456",
+        "Xnd789","Qio012","Hsv345","Fbe678","Rpd901","Wcv234","Tko567","Pya890","Sgu123","Vhl456",
+        "Dwp789","Eiq012","Gjt345","Azk678","Jvv901","Cxw234","Ues567","Obd890","Mfk123","Ylr456",
+        "Lct789","Bqa012","Nuv345","Zmz678","Xli901","Qyn234","Hdb567","Frt890","Rwe123","Wop456",
+        "Tnb789","Pdu012","Sfl345","Vgj678","Dhp901","Eeu234","Gsb567","Aor890","Jci123","Cwm456",
+        "Uxg789","Oby012","Mrp345","Ynt678","Lcd901","Bwp234","Nqi567","Zfz890","Xor123","Qmb456",
+        "Hru789","Fce012","Rit345","Wbn678","Tgw901","Pds234","Smg567","Vzc890","Dlf123","Eyr456",
+        "Gbp789","Ahu012","Jnk345","Cvm678","Uxf901","Osv234","Mrc567","Yzp890","Lfo123","Bxe456",
+        "Nac789","Zus012","Xdq345","Qhk678","Hnp901","Fdt234","Rpf567","Wjl890","Tmx123","Pqy456",
+        "Szc789","Vbt012","Dyk345","Elb678","Gif901","Amw234","Jgj567","Crc890","Uli123","Ocn456",
+        "Mtu789","Yxm012","Lsr345","Bkp678","Nfg901","Zxb234","Xyn567","Qio890","Hrt123","Fmg456",
+        "Rkh789","Wce012","Tgq345","Plr678","Ssd901","Vmp234","Def567","Eho890","Gpg123","Ayw456",
+        "Jsd789","Czc012","Uxf345","Ojm678","Mda901","Ykr234","Lys567","Bzc890","Nqp123","Zvt456",
+        "Xlh789","Qce012","Hqn345","Ftd678","Rbc901","Wrb234","Tle567","Pjn890","Siv123","Vka456",
+        "Dmr789","Ewx012","Ggh345","Ami678","Jcx901","Cqt234","Uwa567","Oxg890","Mvz123","Yre456",
+        "Lkv789","Bbx012","Nrp345","Zto678","Xcb901","Qem234","Hls567","Fuc890","Rgj123","Wmt456",
+        "Tyb789","Phl012","Sqp345","Vvd678","Dcm901","Ewb234","Gtr567","Axi890","Jfp123","Cke456",
+        "Utd789","Obt012","Mgu345","Ywa678","Lra901","Bgf234","Ndj567","Zcb890","Xyl123","Qmf456",
+        "Hwd789","Fok012","Reu345","Wbv678","Tcs901","Pwf234","Smp567","Vtl890","Dni123","Ekj456",
+        "Gfa789","Atp012","Jqz345","Cnb678","Uoc901","Omv234","Slr567","Yxj890","Lzc123","Brt456",
+        "Nfm789","Zhi012","Xvb345","Qpd678","Hwo901","Fzk234","Rvc567","Wul890","Tst123","Pcb456",
+        "Smf789","Vgu012","Dqi345","Ewa678","Gpb901","Aoy234","Jtm567","Ccb890","Uzj123","Osd456",
+        "Mge789","Yxc012","Lde345","Bui678","Ntr901","Zja234","Xgt567","Qfi890","Hlx123","Fbb456",
+        "Rgt789","Wrl012","Tnx345","Piy678","Src901","Vby234","Dgu567","Efs890","Gdc123","Arf456",
+        "Jxg789","Cpm012","Uie345","Oaw678","Msb901","Ycv234","Ldr567","Bvv890","Nfg123","Zby456",
+        "Xte789","Qub012","Hmc345","Fpm678","Rfi901","Wig234","Tnr567","Phj890","Syg123","Vvh456",
+        "Dtt789","Els012","Gzl345","Adi678","Jmf901","Ccr234","Ueq567","Ozu890","Mob123","Yvk456",
+        "Lzf789","Bpx012","Nwc345","Zga678","Xsi901","Qun234","Hgq567","Fjp890","Rpb123","Wfc456",
+        "Ttd789","Pfm012","Sgu345","Vzh678","Dsa901","Egm234","Ggt567","Awf890","Jdr123","Cgc456",
+        "Uyx789","Okt012","Mmf345","Ydc678","Ltc901","Bta234","Nra567","Zlj890","Xar123","Qdv456",
+        "Hyo789","Fis012","Rbw345","Wyb678","Tlj901","Pqe234","Sod567","Vak890","Dyp123","Ejj456",
+        "Gzp789","Anu012","Jgl345","Ckp678","Uit901","Otd234","Mro567","Yqc890","Ltz123","Bxn456",
+        "Nuw789","Zbr012","Xgf345","Qjc678","Hax901","Fgp234","Rtc567","Wyv890","Tbl123","Pjf456",
+        "Sqo789","Vxy012","Dfz345","Eri678","Gkq901","Ahl234","Jav567","Cfk890","Umn123","Ols456",
+        "Mwy789","Ysr012","Lns345","Bjg678","Nfo901","Zbc234","Xpm567","Qdd890","Hrf123","Fmx456",
+        "Rov789","Wng012","Trx345","Pli678","Spx901","Vnc234","Dwo567","Ehb890","Gcy123","Anr456",
+        "Jcs789","Cxr012","Uad345","Oub678","Mvb901","Ydx234","Lky567","Bml890","Nzf123","Zcb456",
+        "Xev789","Qks012","Hut345","Fia678","Rxb901","Wyn234","Tph567","Pld890","Swb123","Vcd456",
+        "Dqw789","Etu012","Ggr345","Avg678","Jnr901","Cyb234","Uch567","Oih890","Mtp123","Yxn456",
+        "Lpb789","Bhl012","Nwj345","Zdf678","Xca901","Qrl234","Hxg567","Ftz890","Rzw123","Wcf456",
+        "Tji789","Pcg012","Sys345","Vkn678","Dvm901","Ehw234","Gkj567","Apt890","Jgp123","Cqn456",
+        "Uyg789","Ogc012","Mds345","Yqn678","Lhj901","Bcl234","Nxg567","Zfp890","Xnr123","Qpd456",
+        "Hja789","Foc012","Rft345","Wpb678","Tmp901","Plf234","Snd567","Vdh890","Dii123","Eho456",
+        "Gds789","Als012","Jxv345","Cmi678","Uzi901","Oir234","Myp567","Ymv890","Lxb123","Bui456",
+        "Nmc789","Zgh012","Xrn345","Qkc678","Hpa901","Fga234","Rdv567","Wbq890","Tot123","Pxy456",
+        "Svf789","Vte012","Dah345","Eok678","Gqw901","Avs234","Jom567","Chc890","Ujl123","Onz456",
+        "Mrn789","Yef012","Lmc345","Boj678","Nbx901","Zzp234","Xjm567","Qow890","Hkf123","Fvy456",
+        "Rzo789","Wjn012","Tgg345","Pny678","Sqk901","Vnu234","Dvd567","Ebv890","Gac123","Alm456",
+        "Jmm789","Cun012","Utp345","Otc678","Mjd901","Yqb234","Lef567","Btn890","Nvk123","Zwu456",
+        "Xvc789","Qog012","Hiw345","Fdq678","Rle901","Wzn234","Tbf567","Pjv890","Syh123","Vip456",
+        "Dsw789","Eto012","Gvt345","Amo678","Jhq901","Crx234","Upl567","Oyn890","Mqr123","Yol456",
+        "Ldr789","Btn012","Ndv345","Zib678","Xuk901","Qak234","Hhc567","Fkb890","Rba123","Wgg456",
+        "Tke789","Pah012","Swd345","Vyk678","Dla901","Eow234","Gmf567","Aef890","Jcl123","Ciu456",
+        "Uvu789","Ocv012","Mpo345","Ywq678","Ljc901","Bxo234","Nuu567","Zea890","Xce123","Qir456",
+        "Hsp789","Fhv012","Row345","Wpj678","Tvi901","Ppx234","Sot567","Vjb890","Dcf123","Eoy456",
+        "Gkx789","Aot012","Jgp345","Csm678","Udt901","Orm234","Mte567","Ynx890","Lca123","Blb456",
+        "Nrz789","Zsk012","Xdp345","Qai678","Hrj901","Fbp234","Rlx567","Wst890","Tyf123","Pui456",
+        "Src789","Vdb012","Dsa345","Ene678","Gkp901","Awx234","Jlr567","Coy890","Ukw123","Ovc456",
+        "Mhd789","Yyn012","Lac345","Bhe678","Nwn901","Zoi234","Xcb567","Qpc890","Hkb123","Ftp456",
+        "Ros789","Wbf012","Tmj345","Pwd678","Sln901","Vpp234","Dib567","Ech890","Gmv123","Adt456",
+        "Jxb789","Cik012","Uae345","Oug678","Mym901","Yxr234","Lje567","Bcg890","Nlw123","Zfi456",
+        "Xao789","Qxb012","Hjx345","Fnd678","Rkf901","Wde234","Tls567","Pyw890","Sji123","Vpq456",
+        "Dyx789","Eda012","Gxe345","Apj678","Jxc901","Cie234","Ugh567","Osk890","Mxb123","Yni456",
+        "Lmw789","Bwj012","Nii345","Zlt678","Xgu901","Qpg234","Hok567","Fps890","Rpp123","Wbk456",
+        "Tnx789","Pjq012","Scy345","Vsu678","Dal901","Exb234","Gdo567","Apl890","Jkj123","Cbg456",
+        "Utu789","Opi012","Mqe345","Yyy678","Lzq901","Bnp234","Nfl567","Zla890","Xyr123","Qto456",
+        "Hue789","Fyq012","Rvp345","Wff678","Tnp901","Psv234","Szi567","Vfk890","Dgb123","Ewm456",
+        "Ges789","Azq012","Jql345","Coe678","Uvn901","Oxz234","Mrh567","Ykk890","Lcz123","Bbx456",
+        "Nop789","Zvg012","Xxc345","Qgg678","Hbv901","Fro234","Rvw567","Wne890","Tnl123","Pia456",
+        "Swm789","Vmu012","Dpi345","Ewc678","Ghp901","Apu234","Jiu567","Crg890","Unz123","Ode456",
+        "Mfp789","Yxe012","Lvo345","Bly678","Nsv901","Zdc234","Xrb567","Qox890","Htg123","Fzw456",
+        "Rxe789","Wbw012","Tdj345","Pnq678","Sxa901","Vtv234","Dlt567","Epl890","Gzd123","Afm456",
+        "Jsj789","Cdg012","Uyh345","Ofr678","Mzx901","Yka234","Lux567","Bjk890","Nma123","Zwd456",
+        "Xpj789","Qdd012","Hfn345","Fws678","Rta901","Wnp234","Tyo567","Pqk890","Snx123","Vnw456",
+        "Dbm789","Eju012","Gbj345","Abq678","Jfl901","Cxt234","Usb567","Orl890","Myy123","Ywg456",
+        "Lhz789","Bnx012","Ndd345","Zln678","Xce901","Qfw234","Hbh567","Fqy890","Rkz123","Wnd456",
+        "Tmm789","Pgs012","Saj345","Vnl678","Dwc901","Eww234","Gdk567","Apd890","Jvl123","Cba456",
+        "Uit789","Omc012","Mfp345","Yzb678","Lcl901","Bfc234","Nui567","Zec890","Xkw123","Qno456",
+        "Hzw789","Fif012","Rol345","Wrh678","Tlm901","Pbn234","Scl567","Vmi890","Dcu123","Ezk456",
+        "Gsd789","Aap012","Jzf345","Ccc678","Ubw901","Ovm234","Mtx567","Yjk890","Ldq123","Bgs456",
+        "Nzg789","Zbr012","Xox345","Qkh678","Hkg901","Fle234","Rrp567","Wgu890","Tsb123","Pxy456",
+        "Sal789","Vpk012","Dcy345","Euc678","Gef901","Ats234","Jhr567","Cnd890","Ulx123","Odd456",
+        "Mqv789","Yxi012","Lbc345","Bak678","Npr901","Zao234","Xdg567","Qsf890","Hjw123","Fmb456",
+        "Rmw789","Wjf012","Tvy345","Phr678","Sxo901","Vpi234","Dph567","Emt890","Gqc123","Ago456",
+        "Jkp789","Cku012","Urt345","Opd678","Mcu901","Yud234","Lhj567","Bws890","Nfm123","Zyy456",
+        "Xif789","Qnb012","Hqo345","Fzn678","Ruh901","Wgn234","Tpy567","Pxt890","Svy123","Vat456",
+        "Dfh789","Ecf012","Ggd345","Awv678","Jem901","Cbd234","Uiv567","Osq890","Mfs123","Ymk456",
+        "Lzz789","Bdu012","Noa345","Zwd678","Xsn901","Qwi234","Hng567","Fcx890","Rds123","Wvj456",
+        "Tfr789","Pns012","Sia345","Vji678","Dho901","Edp234","Gyx567","Aou890","Jsb123","Cnb456",
+        "Ujv789","Oum012","Mhd345","Yfl678","Laq901","Bmr234","Nef567","Zpa890","Xgo123","Qgg456",
+        "Hcm789","Fyx012","Rvw345","Wjc678","Tuc901","Pzy234","Sgz567","Vgo890","Dff123","Emj456",
+        "Gpj789","Agn012","Jmh345","Cvc678","Uls901","Opx234","Maf567","Yar890","Lfp123","Boo456",
+        "Ndd789","Zbb012","Xaa345","Qdd678","Hbb901","Fcc234","Rxx567","Wgg890","Txx123","Pbb456",
+        "Saa789","Vbb012","Dcc345","Ebb678","Gbb901","Add234","Jbb567","Cbb890","Udd123","Obb456",
+        "Mcc789","Ycc012","Lbb345","Bcc678","Nbb901","Zcc234","Xbb567","Qcc890","Hdd123","Fbb456",
+        "Rcc789","Wbb012","Tbb345","Pcc678","Sbb901","Vcc234","Dbb567","Ecc890","Gcc123","Abb456"
+      ]);
+
+      const SUCCESS_URL = 'https://t.me/+NrpwkO62nkYyODJi';
+
+      const bodyEl = document.getElementById('mainBody');
+      const keyInput = document.getElementById('keyInput');
+      const checkBtn = document.getElementById('checkBtn');
+      const messageContainer = document.getElementById('messageContainer');
+
+      function clearErrorState() {
+        bodyEl.classList.remove('error-state');
+      }
+
+      function setErrorState(message = 'Неверный ключ') {
+        bodyEl.classList.add('error-state');
+        messageContainer.innerHTML = `<span class="error-text">${message}</span>`;
+      }
+
+      function showSuccessMessage(validKey) {
+        clearErrorState();
+        messageContainer.innerHTML = `
+          <span style="color: #b3f0c0; font-weight: 500;">Вот ваша ссылка:</span>
+          <a href="${SUCCESS_URL}" target="_blank" class="success-link" rel="noopener noreferrer">${SUCCESS_URL}</a>
+        `;
+      }
+
+      function validateKey() {
+        const rawKey = keyInput.value.trim();
+
+        if (rawKey === '') {
+          setErrorState('Введите ключ');
+          keyInput.focus();
+          return;
+        }
+
+        if (VALID_KEYS.has(rawKey)) {
+          showSuccessMessage(rawKey);
+        } else {
+          setErrorState('Неверный ключ');
+          keyInput.value = '';
+          keyInput.focus();
+        }
+      }
+
+      checkBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        validateKey();
+      });
+
+      keyInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          validateKey();
+        }
+      });
+
+      keyInput.addEventListener('input', () => {
+        if (bodyEl.classList.contains('error-state')) {
+          clearErrorState();
+          messageContainer.innerHTML = '';
+        }
+        if (keyInput.value.trim() === '' && messageContainer.innerHTML !== '') {
+          messageContainer.innerHTML = '';
+        }
+      });
+
+      window.addEventListener('load', () => {
+        clearErrorState();
+        keyInput.value = '';
+        messageContainer.innerHTML = '';
+        keyInput.focus();
+      });
+    })();
+  </script>
+</body>
+</html>
